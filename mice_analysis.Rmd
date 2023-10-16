@@ -1,0 +1,167 @@
+---
+title: "Mice_analysis"
+author: "Abimbola Folami"
+date: "2023-10-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+## import the table into R from github
+```{r cars}
+fturl <- "https://raw.githubusercontent.com/quadram-institute-bioscience/datasciencegroup/main/2_rarefaction/table.csv"
+feat <- read.csv(fturl, header=T, sep = ',')
+feat
+dim(feat)
+
+
+```
+
+```{r}
+
+
+```
+
+
+```{r}
+
+metadata <- read.csv("https://raw.githubusercontent.com/quadram-institute-bioscience/datasciencegroup/main/2_rarefaction/metadata.csv", header=T, sep = ',')
+metadata
+dim(metadata)
+```
+# library
+```{r}
+library(tidyverse)
+
+```
+```{r}
+#feat <- feat %>%
+  #left_join(metadata, by = "X.NAME") 
+#feat
+```
+#Another method to import  directly from the github using the URL link. #Taxonomy Information 
+```{r}
+tax <- read.csv("https://raw.githubusercontent.com/quadram-institute-bioscience/datasciencegroup/main/2_rarefaction/taxonomy.csv", header=T, sep = ',')
+tax
+dim(tax)
+```
+#change of column name for tax file from X.TAXONOMY to X.NAME for easy marge of two tables. 
+```{r}
+tax <- tax %>% 
+  rename_at('X.TAXONOMY', ~'X.NAME')
+tax
+```
+#Merge taxonomy with the feature table.
+```{r}
+
+```
+```{r}
+
+```
+
+## rearrangement of data to have all the sames in one column instead of one sample in a column
+```{r}
+dat <- feat %>%
+  pivot_longer(-X.NAME, names_to = "sample_id", values_to = "count")
+head(dat, 5)
+
+
+
+```
+
+```{r}
+dat_meta <- dat %>%
+  left_join(metadata, by = 'X.NAME') 
+head(dat_meta, 5)
+
+
+```
+
+```{r}
+metadata %>% 
+  filter(Week == 'Early') -> early_sample
+
+metadata %>% 
+  filter(Week == 'Late') -> late_sample
+
+
+e_sample <- early_sample$X.NAME
+l_sample <- late_sample$X.NAME
+
+
+```
+
+
+```{r}
+e_sample
+
+
+
+```
+
+```{r}
+
+p1 <- dat_tax %>%
+  subset(sample_id %in% e_sample) %>% 
+  ggplot(aes(x = sample_id, y = count)) +
+  geom_bar(aes(fill = sample_id), stat = "identity", position = "fill") +
+  facet_grid(~ Phylum) +
+  scale_y_continuous(name = "Relative abundance", labels = scales::percent) +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.text.y = element_text(color = "black"))
+  
+  
+p1
+
+```
+
+```{r}
+
+p2 <- dat_tax %>%
+  subset(sample_id %in% e_sample) %>% 
+  ggplot(aes(x = sample_id, y = count)) +
+  geom_bar(aes(fill = sample_id, scales = "free_x"), stat = "identity", position = "fill", width = 1) +
+  facet_grid(~ Phylum) +
+  scale_y_continuous(name = "Relative abundance", labels = scales::percent) +
+  theme(axis.text.x = element_text(angle = 90),
+        axis.text.y = element_text(color = "black"),
+        strip.text = element_text(face = "bold"),
+        strip.background = element_blank())
+        
+  
+  
+p2
+
+
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+```{r}
+df.all.fact <- cbind(df, df.add.fact)
+```
+
+## import the metadata set itno R from github
+dat <- dat %>%
+  left_join(tax, by = "X.NAME") 
+dat
+```{r}
+
+```
+
+
+
