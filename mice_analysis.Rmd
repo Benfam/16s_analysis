@@ -18,7 +18,7 @@ When you click the **Knit** button a document will be generated that includes bo
 ## import the table into R from github
 ```{r cars}
 fturl <- "https://raw.githubusercontent.com/quadram-institute-bioscience/datasciencegroup/main/2_rarefaction/table.csv"
-feat <- read.csv(fturl, header=T, sep = ',')
+feat <- read.csv(fturl, header=T, sep = ',', row.names = 1)
 feat
 dim(feat)
 
@@ -26,10 +26,16 @@ dim(feat)
 ```
 
 ```{r}
-
+row_mean_df = data.frame(x_name = row.names(feat), mean_value = apply(feat, 1, mean))
+row_mean_df %>% 
+  filter(mean_value > 10) %>% 
+  row.names() -> selected_gene
 
 ```
 
+```{r}
+selected_gene
+```
 
 ```{r}
 
@@ -78,12 +84,23 @@ head(dat, 5)
 ```
 
 ```{r}
-dat_meta <- dat %>%
-  left_join(metadata, by = 'X.NAME') 
-head(dat_meta, 5)
-
-
+metadata
 ```
+
+```{r}
+length(unique(dat$sample_id))
+```
+Lets join table dat and metadata on variable sample_id in dat and varaiable X.name in 
+```{r}
+
+dat_meta <- dat %>%
+  left_join(metadata, c('sample_id' = 'X.NAME')) 
+
+
+head(dat_meta, 5)
+```
+
+
 
 ```{r}
 metadata %>% 
@@ -107,13 +124,13 @@ e_sample
 
 ```
 
-```{r}
+```{r }
 
-p1 <- dat_tax %>%
-  subset(sample_id %in% e_sample) %>% 
-  ggplot(aes(x = sample_id, y = count)) +
+p1 <- dat_meta %>%
+  #subset(sample_id %in% e_sample) %>% 
+  ggplot(aes(x = X.NAME, y = count)) +
   geom_bar(aes(fill = sample_id), stat = "identity", position = "fill") +
-  facet_grid(~ Phylum) +
+  facet_grid(~ Week) +
   scale_y_continuous(name = "Relative abundance", labels = scales::percent) +
   theme(axis.text.x = element_text(angle = 90),
         axis.text.y = element_text(color = "black"))
